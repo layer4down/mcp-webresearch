@@ -27,7 +27,7 @@ import * as path from 'path';
 import * as os from 'os';
 
 // Initialize temp directory for screenshots
-const SCREENSHOTS_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'mcp-screenshots-'));
+const SCREENSHOTS_DIR = './screenshots';
 
 // Initialize Turndown service for converting HTML to Markdown
 // Configure with specific formatting preferences
@@ -115,14 +115,14 @@ async function saveScreenshot(screenshot: string, title: string): Promise<string
 // Cleanup function to remove all screenshots from disk
 async function cleanupScreenshots(): Promise<void> {
     try {
+        // Create directory if it doesn't exist
+        await fs.promises.mkdir(SCREENSHOTS_DIR, { recursive: true });
+        
         // Remove all files in the screenshots directory
         const files = await fs.promises.readdir(SCREENSHOTS_DIR);
         await Promise.all(files.map(file =>
             fs.promises.unlink(path.join(SCREENSHOTS_DIR, file))
         ));
-
-        // Remove the directory itself
-        await fs.promises.rmdir(SCREENSHOTS_DIR);
     } catch (error) {
         console.error('Error cleaning up screenshots:', error);
     }
